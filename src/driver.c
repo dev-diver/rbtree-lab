@@ -4,15 +4,9 @@
 
 int main(int argc, char *argv[]) {
     rbtree *tree=new_rbtree();
-    printPreOrder(tree);
     rbtree_insert(tree,10);
-    rbtree_insert(tree,20);
-    rbtree_insert(tree,1);
-    rbtree_insert(tree,30);
-    rbtree_insert(tree,3);
     rbtree_insert(tree,5);
-    rbtree_insert(tree,11);
-    printPreOrder(tree);
-    delete_rbtree(tree);
-    printPreOrder(tree);
+    rbtree_insert(tree,6);
+    printPreOrder(tree); 
+    printf("값 찾기: %d\n",rbtree_find(tree,10)->key);
 }

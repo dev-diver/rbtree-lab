@@ -26,7 +26,12 @@ void preOrder(node_t* n) {
   }else{
     color="BLK";
   }
-  printf("(%s %d)\n",color,n->key);
+  
+  char leftKey[10] ="o";
+  char rightKey[10] ="o";
+  if(n->left!=0) sprintf(leftKey,"%d",n->left->key);
+  if(n->right!=0) sprintf(rightKey,"%d",n->right->key);
+  printf("%s/(%s %d)\\%s\n",leftKey,color,n->key,rightKey);
   preOrder(n->left);
   preOrder(n->right);
   return;
@@ -56,7 +61,7 @@ node_t *rbtree_insert(rbtree *t, const key_t key) {
   newNode->right = 0;
 
   node_t *x = t->root;
-  node_t *y;
+  node_t *y = x;
 
   if(t->root==0) {
     t->root = newNode;
@@ -76,15 +81,102 @@ node_t *rbtree_insert(rbtree *t, const key_t key) {
       y->right = newNode;
     }
     newNode->parent = y;
-    
-  }
 
+    if(y->color == RBTREE_RED){
+      rbtree_fixup(t,newNode);
+    }
+  }
   return t->root;
 }
 
+void rbtree_fixup(rbtree *t, node_t *n){
+  while(n->parent!=0 && n->parent->color == RBTREE_RED){ //부모의 색을 계속 체크
+    if (n->parent == n->parent->parent->left){ //부모가 왼쪽인 경우
+      node_t *uncle = n->parent->parent->right;
+      if(uncle!=0 && uncle->color == RBTREE_RED){//case 1
+        uncle->color = RBTREE_BLACK;
+        n->parent->color = RBTREE_BLACK;
+        n->parent->parent->color = RBTREE_RED;
+        n = n->parent->parent;
+      }else{ //case2,3
+        if(n == n->parent->right){ //case2
+          n = n->parent;
+          left_rotate(t,n);
+        }
+        n->parent->color = RBTREE_BLACK;
+        n->parent->parent->color = RBTREE_RED;
+        right_rotate(t,n->parent->parent);
+        //case3
+      }
+    }else{ //부모가 왼쪽인 경우
+      node_t *uncle = n->parent->parent->left;
+      if(uncle!=0 && uncle->color == RBTREE_RED){//case 1
+        uncle->color = RBTREE_BLACK;
+        n->parent->color = RBTREE_BLACK;
+        n->parent->parent->color = RBTREE_RED;
+        n = n->parent->parent;
+      }else{ //case2,3
+        if(n == n->parent->left){ //case2
+          n = n->parent;
+          right_rotate(t,n);
+        }
+        n->parent->color = RBTREE_BLACK;
+        n->parent->parent->color = RBTREE_RED;
+        left_rotate(t,n->parent->parent);
+        //case3
+      }
+    }
+  }
+  t->root->color = RBTREE_BLACK;
+
+}
+
+void left_rotate(rbtree *t, node_t *n){
+  node_t *y = n->right;
+  n->right = y->left;
+  if(y->left != 0){
+    y->left->parent = n;
+  }
+  y->parent = n->parent;
+  if(n->parent == 0){
+    t->root = y;
+  }else if(n == n->parent->left){
+    n->parent->left = y;
+  }else{
+    n->parent->right = y;
+  }
+  y->left = n;
+  n->parent = y;
+}
+
+void right_rotate(rbtree *t, node_t *n){
+  node_t *y = n->left;
+  n->left = y->right;
+  if(y->right != 0){
+    y->right->parent = n;
+  }
+  y->parent = n->parent;
+  if(n->parent == 0){
+    t->root = y;
+  }else if(n == n->parent->right){
+    n->parent->right = y;
+  }else{
+    n->parent->left = y;
+  }
+  y->right = n;
+  n->parent = y;
+}
+
 node_t *rbtree_find(const rbtree *t, const key_t key) {
-  // TODO: implement find
-  return t->root;
+  node_t *n = t->root;
+  while(n!=0 && n->key != key){
+    if(key <= n->key){
+      n = n->left;
+    }else{
+      n = n->right;
+    }
+  }
+  return n;
 }
 
 node_t *rbtree_min(const rbtree *t) {
