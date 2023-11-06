@@ -7,6 +7,6 @@ int main(int argc, char *argv[]) {
     rbtree_insert(tree,10);
     rbtree_insert(tree,5);
     rbtree_insert(tree,6);
-    printPreOrder(tree); 
-    printf("값 찾기: %d\n",rbtree_find(tree,10)->key);
+    // printPreOrder(tree); 
+    // printf("값 찾기: %d\n",rbtree_find(tree,10)->key);
 }
