@@ -2,11 +2,30 @@
 #include <stdio.h>
 #include <assert.h>
 #include "rbtree.h"
-#include "helper.h"
+
+void printPreOrder(rbtree *);
+void preOrder(rbtree *,node_t *);
+void postOrderDelete(rbtree *, node_t *);
+
+void rbtree_fixup(rbtree *, node_t *);
+void right_rotate(rbtree *, node_t *);
+void left_rotate(rbtree *, node_t *);
+
+void rb_transplant(rbtree *, node_t *, node_t *);
+node_t* rbtree_minimum(const rbtree *, node_t *);
+void rb_erase_fixup(rbtree *, node_t *);
+void inOrderToArray(const rbtree *, node_t *, key_t *, size_t, int *);
+
 
 rbtree *new_rbtree(void) {
   rbtree *p = (rbtree *)calloc(1, sizeof(rbtree));
-  node_t *nil =(node_t *)calloc(1,sizeof(node_t));
+  if(p==0){ //null check
+    return 0;
+  }
+  node_t *nil = (node_t *)calloc(1,sizeof(node_t));
+  if(nil==0){ //null check
+    return 0;
+  }
   node_t nilNode = {RBTREE_BLACK,-1,0,0,0};
   *nil = nilNode;
 
@@ -46,6 +65,7 @@ void preOrder(rbtree *tree, node_t* nowNode) {
 void delete_rbtree(rbtree *t) {
   //printPreOrder(t);
   postOrderDelete(t,t->root);
+  free(t->nil);
   free(t);
   printf("\n삭제 완료\n");
 }
@@ -62,6 +82,9 @@ node_t *rbtree_insert(rbtree *t, const key_t key) {
 
   node_t node = {RBTREE_RED,key,t->nil,t->nil,t->nil};
   node_t *newNode = (node_t *)calloc(1, sizeof(node_t));
+  if(newNode==0){ //null check
+    return 0;
+  }
   *newNode = node;
 
   node_t *x = t->root;
