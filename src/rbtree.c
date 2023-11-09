@@ -75,7 +75,8 @@ void postOrderDelete(rbtree *t, node_t* n){
   postOrderDelete(t,n->left);
   postOrderDelete(t,n->right);
   printf("(%d 삭제)",n->key);
-  rbtree_erase(t,n);
+  // rbtree_erase(t,n);
+  free(n);
 }
 
 node_t *rbtree_insert(rbtree *t, const key_t key) {
@@ -237,7 +238,7 @@ int rbtree_erase(rbtree *t, node_t *p) {
   node_t *x; //주목 노드
   node_t *y = p;
   color_t y_ori_color = y->color;
-  if (p->left==t->nil){  //left 없는 경우
+  if (p->left == t->nil){  //left 없는 경우
     x = p->right;
     rb_transplant(t,p,p->right);  
   }else if(p->right == t->nil){ //right 없는 경우
@@ -266,10 +267,11 @@ int rbtree_erase(rbtree *t, node_t *p) {
     rb_erase_fixup(t,x);
   }
 
+  t->nil->color = RBTREE_BLACK;
+  t->nil->key = -1;
   t->nil->parent = NULL;
   t->nil->right = NULL;
   t->nil->left = NULL;
-  t->nil->color = RBTREE_BLACK;
   
   return 0;
 }
